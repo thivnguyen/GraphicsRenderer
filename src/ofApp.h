@@ -42,7 +42,7 @@ public:
     void drawLights();
     void drawSpotlights();
     bool addShadows(Ray rayCamPix, glm::vec3 point);
-    bool obstructed (const glm::vec3 &point, const glm::vec3 &norm, Light &light);
+    bool obstructed (const glm::vec3 &point, const glm::vec3 &norm, glm::vec3 lightPos);
     bool mouseToDragPlane(int x, int y, glm::vec3 &point);
     
     void sceneSetup1();
@@ -93,8 +93,8 @@ private:
     
 //    ofPixels textureDiffuse;
 //    ofPixels textureSpecture;
-    int imageWidth = 300;
-    int imageHeight = 200;
+    int imageWidth = 600;
+    int imageHeight = 400;
     
     //for debugging
 //    int imageWidth = 6;

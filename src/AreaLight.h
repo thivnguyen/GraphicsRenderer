@@ -16,6 +16,7 @@ public:
     //AreaLight(glm::vec3 pos, float lightInt, float w, float h, int col, int rows, float angle);
     AreaLight(glm::vec3 pos, float lightInt);
     void draw();
+    void draw(ofColor color);
     float getWidth();
     float getHeight();
     bool withinLight(glm::vec3 point);
@@ -34,6 +35,7 @@ public:
     int getNumCols();
     
 private:
+    vector <Ray> rays;
     float totalIntensity;
     float width;
     float height;

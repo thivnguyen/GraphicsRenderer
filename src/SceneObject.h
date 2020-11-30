@@ -10,6 +10,7 @@
 
 #include "ofMain.h"
 #include <glm/gtx/intersect.hpp>
+#include <glm/gtx/euler_angles.hpp>
 
 
 class Ray;
@@ -36,6 +37,9 @@ public:
     void setDiffuseColor (ofColor color);
     void setSelectable (bool select);
     bool isSelectable();
+    void setRotation (glm::vec3 rotate);
+    glm::mat4 getLocalMatrix();
+    glm::mat4 getRotationMatrix();
     
 private:
     glm::vec3 position;
@@ -46,6 +50,7 @@ private:
     vector <SceneObject *> children;
     glm::vec3 localPos;
     bool selectable;
+    glm::vec3 rotation;   // rotate
 };
 
 #endif /* SceneObject_h */

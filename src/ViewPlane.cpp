@@ -19,7 +19,7 @@ ViewPlane::ViewPlane(glm::vec2 p0, glm::vec2 p1){
 ViewPlane::ViewPlane(){ //6 x 4 aspect
     min = glm::vec2(-3, -2);
     max = glm::vec2(3, 2);
-    setPosition(glm::vec3(0, 0, 5));
+    setPosition(glm::vec3(0, 0, -5));
 }
 
 //set new size for viewPlane

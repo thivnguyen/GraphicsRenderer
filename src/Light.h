@@ -21,7 +21,7 @@ public:
     void setIntensity(float newIntensity);
     void draw();
     void draw(ofColor color);
-    bool withinLight(glm::vec3 point);
+    virtual bool withinLight(glm::vec3 point);
     bool intersect (Ray &ray, glm::vec3 &point, glm::vec3 &normal); //overload intersection function
     
 private:

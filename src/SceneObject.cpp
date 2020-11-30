@@ -8,10 +8,14 @@
 #include <stdio.h>
 #include "SceneObject.h"
 
+using namespace glm;
+
 //Constructs a SceneObject with a given name
 SceneObject::SceneObject(string n){
     parent = NULL;
-    position = glm::vec3 (0,0,0); //default position of a SceneObject
+    position = glm::vec3 (0,0,0);
+    rotation = glm::vec3 (0,0,0);
+    //default position of a SceneObject
     diffuseColor = ofColor:: white; //default color
     specularColor = ofColor:: lightGray;
     name = n;
@@ -25,6 +29,7 @@ SceneObject::SceneObject (glm::vec3 pos, ofColor diffuseCol, string n){
     diffuseColor = diffuseCol;
     specularColor = ofColor:: lightGray;
     position = pos;
+    rotation = glm::vec3 (0,0,0);
     name = n;
     setLocalPosition(position);
     selectable = true;
@@ -39,6 +44,7 @@ SceneObject::SceneObject (glm::vec3 pos, ofColor diffuseCol, ofColor specularCol
     name = n;
     setLocalPosition(position);
     selectable = true;
+    rotation = glm::vec3 (0,0,0);
 }
 
 //get name of SceneObject
@@ -93,6 +99,22 @@ glm::mat4 SceneObject::getTranslationMatrix(){
     return (translate(glm::mat4(1.0), glm::vec3(localPos.x, localPos.y, localPos.z)));
 }
 
+glm::mat4 SceneObject::getRotationMatrix(){
+    //euler, rotate (x deg, y deg, z deg)
+    return (eulerAngleXYZ(glm::radians(rotation.x), radians(rotation.y), radians(rotation.z)));
+}
+
+//Gets the object's local transformation matrix
+glm::mat4 SceneObject::getLocalMatrix(){
+    
+    // get the local transformations of matrix
+    mat4 rotate = getRotationMatrix();
+    mat4 trans = getTranslationMatrix();
+
+    return trans * rotate;
+}
+
+
 //gets the objects transformation matrix
 glm::mat4 SceneObject::getTransformationMatrix(){
     // if we have a parent (we are not the root),
@@ -100,9 +122,9 @@ glm::mat4 SceneObject::getTransformationMatrix(){
     
     //if not root
     if (parent != NULL) {
-        return  parent->getTransformationMatrix() * getTranslationMatrix() ;
+        return  parent->getTransformationMatrix() * getLocalMatrix() ;
     }
-    return getTranslationMatrix();
+    return getLocalMatrix();
 }
 
 //remove sceneobject from parent, return parent
@@ -161,4 +183,8 @@ void SceneObject::setSelectable (bool select){
 
 bool SceneObject::isSelectable(){
     return selectable;
+}
+
+void SceneObject::setRotation (glm::vec3 rotate){
+    rotation = rotate;
 }

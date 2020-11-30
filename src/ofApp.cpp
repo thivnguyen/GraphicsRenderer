@@ -37,8 +37,8 @@ void ofApp::setup(){
 //    scene.push_back (new Sphere (vec3 (1.25, -0.25, -5), 1.5, ofColor::purple));
 //
  //   lights.push_back (new Light (vec3(4,7,5), 23));
- //   lights.push_back (new Light (vec3(-7,4,0), 23));
-    lights.push_back (new AreaLight (vec3(0, 8, -5), 75));
+ //    lights.push_back (new Spotlight (vec3 (-1.5,10, 3), 20, 10, vec3 (1, -1.25, -3)));
+    lights.push_back (new AreaLight (vec3(0, 8, -5), 1.5));
     ambient = Light (renderCam.getPosition(), 15, ofColor::black);
 //
 //    //set power value for Phong shading
@@ -537,6 +537,7 @@ void ofApp::rayTrace(){
                     //grab textures from texture maps
                     ofColor dif = textureDiff(intersectPtClosest, ((Plane*) closestObj));
                     ofColor spec = textureSpec(intersectPtClosest, ((Plane*) closestObj));
+                   // cout << shader (intersectPtClosest, intersectNormClosest, dif, spec, power) << endl;
                     image.setColor(i, imageHeight - 1 - j, shader (intersectPtClosest, intersectNormClosest, dif, spec, power));
                 }
                 
@@ -574,31 +575,37 @@ ofColor ofApp::shader(const glm::vec3 &point, const glm::vec3 &norm, const ofCol
 //shades image using Lambert shading
 ofColor ofApp::lambert(const glm::vec3 &point, const glm::vec3 &norm, const ofColor diffuse){
     ofColor ld = 0;
+    //cout << diffuse << endl;
     for (Light* light: lights){
         if (light -> withinLight(point)){
-            
+
             if (light -> getName() == "AreaLight"){
                 AreaLight* areaLight = (AreaLight *) light;
                 //loop through grid to determine ld
                 for (int row = 0; row <  areaLight -> getNumRows(); row++){
                     for (int col = 0; col <  areaLight -> getNumCols(); col++){
                         vec3 cellPt (areaLight -> getCellPt(row, col));
-                        if (!obstructed(point, norm, *light)){
-                            
+                        if (!obstructed(point, norm, cellPt)){
+
                             //distance from point to light
-                            float r2 = distance2 (point, light -> getPosition());
-                            
+                            float r2 = distance2 (point, cellPt);
+
                             //vector from point to light
-                            vec3 l (light -> getPosition() - point);
-                            
-                            ld += diffuse * (areaLight -> getUnitIntensity()/r2) * glm::max(0.0f, glm::dot(normalize(norm), normalize(l)));
+                            vec3 l (cellPt - point);
+                            //cout << "ld: before" << ld << endl;
+                            //cout << "diffuse: " << diffuse << endl;
+                            //cout << areaLight -> getUnitIntensity()/r2 << endl;
+                            //cout << "Max: " << glm::max(0.0f, glm::dot(normalize(norm), normalize(l))) << endl;
+                            //cout << "Equation: " << diffuse * (areaLight -> getUnitIntensity()/1) * glm::max(0.0f, glm::dot(normalize(norm), normalize(l))) << endl;
+                            ld += diffuse * (areaLight -> getUnitIntensity()/1) * glm::max(0.0f, glm::dot(normalize(norm), normalize(l)));
+                            //cout << "ld: after" << ld << endl;
                         }
                     }
                 }
             }
             else{
                 //only add to ld if point is not in the shadows
-                if (!obstructed(point, norm, *light)){
+                if (!obstructed(point, norm, light -> getPosition())){
                     
                     //distance from point to light
                     float r2 = distance2 (point, light -> getPosition());
@@ -606,7 +613,7 @@ ofColor ofApp::lambert(const glm::vec3 &point, const glm::vec3 &norm, const ofCo
                     //vector from point to light
                     vec3 l (light -> getPosition() - point);
                     
-                    ld += diffuse * (light -> getIntensity()/r2) * glm::max(0.0f, glm::dot(normalize(norm), normalize(l)));
+                    ld += diffuse * (light -> getIntensity()/1) * glm::max(0.0f, glm::dot(normalize(norm), normalize(l)));
                 }
             }
         }
@@ -643,8 +650,32 @@ ofColor ofApp::phong(const glm::vec3 &point, const glm::vec3 &norm, const ofColo
     for (Light* light: lights){
         
         if (light -> withinLight(point)){
+            
+            if (light -> getName() == "AreaLight"){
+                AreaLight* areaLight = (AreaLight *) light;
+                //loop through grid to determine ld
+                for (int row = 0; row <  areaLight -> getNumRows(); row++){
+                    for (int col = 0; col <  areaLight -> getNumCols(); col++){
+                        vec3 cellPt (areaLight -> getCellPt(row, col));
+                        if (!obstructed(point, norm, cellPt)){
+
+                            //distance from point to light
+                            float r2 = distance2 (point, cellPt);
+
+                            //vector from point to light
+                            vec3 l (cellPt - point);
+                            
+                            //find bisector
+                            vec3 h = normalize (v + l);
+
+                            ls += specular * (areaLight -> getUnitIntensity()/r2)  * glm::pow(glm::max(0.0f, glm::dot(normalize(norm), h)), power);
+                        }
+                    }
+                }
+            }
+            else{
         //only add to ls if point is not in the shadows
-        if (!obstructed(point, norm, *light)){
+        if (!obstructed(point, norm, light -> getPosition())){
             //distance from point to light
             float r2 = distance2 (point, light -> getPosition());
             
@@ -656,6 +687,7 @@ ofColor ofApp::phong(const glm::vec3 &point, const glm::vec3 &norm, const ofColo
             
             ls += specular * (light -> getIntensity()/r2)  * glm::pow(glm::max(0.0f, glm::dot(normalize(norm), h)), power);
         }
+            }
     }
 }
     
@@ -682,10 +714,10 @@ ofColor ofApp::phong(const glm::vec3 &point, const glm::vec3 &norm, const ofColo
 }
 
 //checks whether a ray from point going to light is obstructed by any objects
-bool ofApp::obstructed (const glm::vec3 &point, const glm::vec3 &norm, Light &light){
+bool ofApp::obstructed (const glm::vec3 &point, const glm::vec3 &norm, glm::vec3 lightPos){
     
     vec3 newPoint (point + norm * 0.0001);
-    Ray shadowRay (newPoint, normalize (light.getPosition() - newPoint)); //ray from point to light
+    Ray shadowRay (newPoint, normalize (lightPos - newPoint)); //ray from point to light
     
     //check if intersect with any object
     for (SceneObject* sObj: scene){

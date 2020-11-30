@@ -19,10 +19,10 @@
 //}
 
 AreaLight::AreaLight (glm::vec3 pos, float lightInt):Light (pos, lightInt, "AreaLight"){
-    width = 5;
-    height = 5;
-    numRows = 10;
-    numColumns = 10;
+    width = 2.5;
+    height = 2.5;
+    numRows = 5;
+    numColumns = 5;
     lightArea.rotateDeg(90, 1, 0, 0); //plane initally stands vertical, rotate around x-axis 90 degrees
     widthRange = glm::vec2(getPosition().x - width / 2, getPosition().x + width / 2);
     heightRange = glm::vec2(getPosition().z - height / 2, getPosition().z + height / 2);
@@ -40,8 +40,8 @@ void AreaLight::draw(){
    lightArea.setHeight(height);
    lightArea.setResolution(numColumns, numRows); //set #columns and #rows
     lightArea.drawWireframe();
-    ofSetColor (ofColor::yellow);
-    ofDrawLine (startingCell(), getPosition());
+//    ofSetColor (ofColor::yellow);
+//    ofDrawLine (startingCell(), getPosition());
     //ofDrawLine (glm::vec3 (widthRange.y, getPosition().y, heightRange.y), getPosition());
     
 //    for (int i = 0; i < numRows; i++){
@@ -52,8 +52,47 @@ void AreaLight::draw(){
 //            ofDrawLine (cell, glm::vec3(getPosition().x, -5, getPosition().z));
 //        }
 //    }
+    
+//    for (Ray ray: rays){
+//        ray.draw(50);
+//    }
 }
 
+void AreaLight::draw(ofColor color){
+    ofSetColor(color);
+       lightArea.setPosition(getPosition());
+       lightArea.setWidth(width);
+      lightArea.setHeight(height);
+      lightArea.setResolution(numColumns, numRows); //set #columns and #rows
+       lightArea.drawWireframe();
+//       ofSetColor (ofColor::yellow);
+//       ofDrawLine (startingCell(), getPosition());
+    for (Ray ray: rays){
+        ray.draw(50);
+    }
+}
+
+bool AreaLight::withinLight(glm::vec3 point){
+//    cout << point << endl;
+//       //vector from arealight to intersection point
+//       glm::vec3 lightToPt(getPosition() - point);
+//        glm::vec3 intersectNormal;
+//        glm::vec3 intersectPt;
+//        Ray ray (point, normalize(glm::vec3 (0,5,0) - glm::vec3 (0,0,0)));
+//       //check whether vector is in light
+//    rays.push_back(ray);
+//    bool in = intersect(ray, intersectPt, intersectNormal);
+    bool in;
+    if (point.x < widthRange.y && point.x > widthRange.x && point.z < heightRange.y && point.z > heightRange.x){
+        in =  true;
+        cout << "in" << endl;
+    }
+    else{
+        in = false;
+        cout << "out" << endl;
+    }
+    return in;
+}
 
 bool AreaLight::withinLightGrid(glm::vec3 point, int row, int column){
     
@@ -133,5 +172,5 @@ int AreaLight::getNumCols(){
 }
 
 float AreaLight::getUnitIntensity(){
-    return totalIntensity / (numRows * numColumns);
+    return getIntensity() / (numRows * numColumns);
 }
