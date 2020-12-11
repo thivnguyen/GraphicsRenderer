@@ -22,7 +22,7 @@ public:
     SceneObject (glm::vec3 pos, ofColor diffuseCol, ofColor specularCol, string n);
     string getName();
     glm::vec3 getPosition ();
-    void setPosition (glm::vec3 pos);
+    virtual void setPosition (glm::vec3 pos);
     ofColor getDiffuseColor();
     ofColor getSpecularColor();
     virtual void draw() = 0; //virtual function, needs to overload
