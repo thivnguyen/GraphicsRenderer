@@ -96,12 +96,12 @@ void SceneObject::setLocalPosition(glm::vec3 pos){
 }
 
 glm::mat4 SceneObject::getTranslationMatrix(){
-    return (translate(glm::mat4(1.0), glm::vec3(localPos.x, localPos.y, localPos.z)));
+    return translate(glm::mat4(1.0), glm::vec3(localPos.x, localPos.y, localPos.z));
 }
 
 glm::mat4 SceneObject::getRotationMatrix(){
     //euler, rotate (x deg, y deg, z deg)
-    return (eulerAngleXYZ(glm::radians(rotation.x), radians(rotation.y), radians(rotation.z)));
+    return eulerAngleXYZ(glm::radians(rotation.x), radians(rotation.y), radians(rotation.z));
 }
 
 //Gets the object's local transformation matrix

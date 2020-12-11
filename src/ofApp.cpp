@@ -592,13 +592,7 @@ ofColor ofApp::lambert(const glm::vec3 &point, const glm::vec3 &norm, const ofCo
 
                             //vector from point to light
                             vec3 l (cellPt - point);
-                            //cout << "ld: before" << ld << endl;
-                            //cout << "diffuse: " << diffuse << endl;
-                            //cout << areaLight -> getUnitIntensity()/r2 << endl;
-                            //cout << "Max: " << glm::max(0.0f, glm::dot(normalize(norm), normalize(l))) << endl;
-                            //cout << "Equation: " << diffuse * (areaLight -> getUnitIntensity()/1) * glm::max(0.0f, glm::dot(normalize(norm), normalize(l))) << endl;
                             ld += diffuse * (areaLight -> getUnitIntensity()/1) * glm::max(0.0f, glm::dot(normalize(norm), normalize(l)));
-                            //cout << "ld: after" << ld << endl;
                         }
                     }
                 }
