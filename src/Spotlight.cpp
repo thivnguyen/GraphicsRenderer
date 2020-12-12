@@ -39,7 +39,19 @@ bool Spotlight::withinLight(glm::vec3 point){
     
 }
 
+float Spotlight::getAngle(){
+    return coneAngle;
+    
+}
 
 void Spotlight::setAngle (float newAngle){
     coneAngle = newAngle;
+}
+
+glm::vec3 Spotlight::getAim(){
+    return lightAim;
+}
+
+void Spotlight::setAim(glm::vec3 aim){
+    lightAim = aim;
 }

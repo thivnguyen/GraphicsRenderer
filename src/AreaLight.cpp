@@ -18,10 +18,10 @@ AreaLight::AreaLight (glm::vec3 pos, float lightInt):Light (pos, lightInt, "Area
     heightRange = glm::vec2(getPosition().z - height / 2, getPosition().z + height / 2);
     normal = glm::vec3 (0, 1, 0);
     isHorizontal = true;
+    
     cout << widthRange << endl;
     cout << heightRange << endl;
     cout << getPosition() << endl;
-    
 }
 
 AreaLight::AreaLight (glm::vec3 pos, float lightInt, bool horizontal){
@@ -88,7 +88,17 @@ bool AreaLight::withinLight(glm::vec3 point){
             return true;
         }
     }
-     return false;
+    return false;
+    
+       
+       //vector from spotlight to intersection point
+//    glm::vec3 lightToPt(point - getPosition());
+//     Ray ray (point, normalize (lightToPt));
+//    bool intersectPl = intersect (ray, point, normal);
+//    if (intersectPl == false){
+//        cout << "false" << endl;
+//    }
+//    return intersectPl;
 }
 
 glm::vec3 AreaLight::startingCell(){

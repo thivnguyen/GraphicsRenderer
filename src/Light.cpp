@@ -10,7 +10,7 @@
 #include "Ray.h"
 
 Light::Light():SceneObject ("Light"){
-    intensity = 75;
+    intensity = 1;
 }
 
 //Create a Light object with a given position
@@ -24,7 +24,7 @@ Light::Light(glm::vec3 pos, float lightInt, string name):SceneObject (pos,ofColo
 }
 
 Light::Light(glm::vec3 pos, float lightInt, ofColor diffuse): SceneObject(pos, diffuse,"Light"){
-    intensity = 15;
+    intensity = 1;
 }
 
 //Get light intensity

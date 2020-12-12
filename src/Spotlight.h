@@ -14,12 +14,15 @@ class Spotlight: public Light {
 
 public:
     Spotlight(glm::vec3 pos, float lightInt, float angle, glm::vec3 aim);
+    glm::vec3 getAim();
+    void setAim(glm::vec3 aim);
     void draw();
     bool withinLight(glm::vec3 point);
     void setAngle (float newAngle);
+    float getAngle ();
     
 private:
-    float coneAngle;
+        float coneAngle;
     glm::vec3 lightAim;
 };
 

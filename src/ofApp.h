@@ -130,6 +130,8 @@ private:
     ofxFloatSlider light2Intensity;
     ofxFloatSlider spotlightIntensity;
     ofxFloatSlider spotlightAngle;
+    ofxVec3Slider spotlightAim;
+    ofxColorSlider sphereColor;
     
     ofxPanel gui;
     
