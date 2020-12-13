@@ -16,6 +16,8 @@
 #include "ofxGui.h"
 
 class Spotlight;
+class AreaLight;
+
 
 class ofApp : public ofBaseApp{
     
@@ -126,6 +128,10 @@ private:
     
     SceneObject* lastSelected;
     
+    ofxFloatSlider areaLightIntensity;
+    //ofxVec3Slider areaLightAngle;
+    ofxFloatSlider areaLightLR;
+    ofxFloatSlider areaLightUD;
     ofxFloatSlider light1Intensity;
     ofxFloatSlider light2Intensity;
     ofxFloatSlider spotlightIntensity;
@@ -135,9 +141,16 @@ private:
     
     ofxPanel gui;
     
+    ofxLabel areaLightLbl;
+    ofxLabel spotlightLbl;
+    ofxLabel lightLbl;
+    ofxLabel sphereLbl;
+    
     Light* light1;
     Light* light2;
     Spotlight* spotlight;
-
+    AreaLight* areaLight;
     
+    Plane* plane;
+
 };

@@ -24,8 +24,10 @@ void ofApp::setup(){
     dragModeEnabled = false;
     sphereCreationModeEnabled = false;
     
-    scene.push_back (new Plane (vec3(0,-2,2), ofColor::white, 30, 70, true));
-    //
+    plane = new Plane (vec3(0,-2,2), ofColor::white, 30, 70, true);
+    scene.push_back (plane);
+    //scene.push_back ( new Plane (vec3(0,-2,-20), ofColor::white, 30, 70, false));
+    
     light1 = new Light (vec3(4,7,5), 0.5);
     light2 = new Light (vec3(-7,4,0), 0.5);
     spotlight = new Spotlight (vec3 (-1.5,10, 3), 0.5, 50, vec3 (1, -1.25, -3));
@@ -37,23 +39,37 @@ void ofApp::setup(){
     //    scene.push_back (new Sphere (vec3 (1.25, -0.25, -5), 1.5, ofColor::purple));
     //
     //   lights.push_back (new Light (vec3(4,7,5), 23));
-    //    lights.push_back (new Spotlight (vec3 (-1.5,10, 3), 20, 10, vec3 (1, -1.25, -3)));
-    lights.push_back (new AreaLight (vec3(0, 8, -5), 1.5));
+    //    lights.push_back (new Spotlight (vec3 (-1.5,10, 3), 20, 10, vec3 (1, -1.25, -3)));cs
+    areaLight = new AreaLight (vec3(0, 10, -5), 1.5, vec3 (90,0,0));
+    lights.push_back (areaLight);
     ambient = Light (renderCam.getPosition(), 15, ofColor::black);
-    //
-    //    //set power value for Phong shading
+    
+    //set power value for Phong shading
     power = 70;
-    //
+    
     gui.setup();
     
+    gui.add (areaLightLbl.setup ("","Area Light Controls", 200, 25));
+    areaLightLbl.setFillColor (ofColor::green);
+    gui.add (areaLightIntensity.setup("Area Light Intensity", areaLight -> getIntensity(), 0, 10));
+    //gui.add (areaLightAngle.setup("Area Light Angle", areaLight -> getRotation(), vec3 (0,0,0), vec3 (90,90,90)));
+    gui.add (areaLightLR.setup("Tilt Left + Right", 0, 0, 90));
+    gui.add (areaLightUD.setup("Tilt Up + Down", 90, 0, 90));
+    
+    gui.add (lightLbl.setup ("","Point Lights Controls", 200, 25));
     gui.add (light1Intensity.setup("Light 1 Intensity", light1 -> getIntensity(), 0, 10));
     gui.add (light2Intensity.setup("Light 2 Intensity", light2 -> getIntensity(), 0, 10));
+    
+     gui.add (spotlightLbl.setup ("","Spotlight Controls", 200, 25));
     gui.add (spotlightIntensity.setup("Spotlight Intensity", spotlight -> getIntensity(), 0, 10));
     gui.add (spotlightAngle.setup("Spotlight Angle", spotlight -> getAngle(), 0, 100));
     gui.add (spotlightAim.setup("Spotlight Aim", spotlight -> getAim(), vec3 (-5,-5,-5), vec3 (5,5,5)));
+    
+     gui.add (sphereLbl.setup ("","Sphere Controls", 200, 25));
     gui.add(sphereColor.setup("Sphere color", ofColor(255, 255, 255), ofColor(0, 0), ofColor(255, 255)));
     
-    
+    //bool test = areaLight -> withinLight (vec3 (0,0,0));
+
     
     //horizontal plane
     //scene with 3 spheres and 2 lights
@@ -85,13 +101,19 @@ void ofApp::setup(){
     
     //tabletop with 2 spotlights only
     //sceneSetup10wS();
+    
     //load texture images
-    textureDiffuseH.load ("woodDiff.jpg"); //load texture image
-    textureSpectureH.load("woodSpec.jpg"); //load texture image
+    textureDiffuseH.load ("streetDiff.jpg"); //load texture image
+    textureSpectureH.load("streetSpec.jpg"); //load texture image
+    
+    textureDiffuseV.load ("woodDiff.jpg"); //load texture image
+    textureSpectureV.load("woodSpec.jpg"); //load texture image
     
     textureWidthH = textureDiffuseH.getWidth();
     textureHeightH = textureDiffuseH.getHeight();
     
+    textureWidthV = textureDiffuseV.getWidth();
+    textureHeightV = textureDiffuseV.getHeight();
     
     //set num of "texture tiles" in both directions
     numTilesHorizontal = 12;
@@ -117,11 +139,16 @@ void ofApp::setup(){
     
     //alocate pixels for image
     image.allocate(imageWidth, imageHeight, OF_IMAGE_COLOR);
+    cout << "Transform:: " << vec3 (areaLight -> getTransformationMatrix() * vec4 (-1.25,10,-1.25,1)) << endl;
     
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    areaLight -> setIntensity (areaLightIntensity);
+    float UD = areaLightUD;
+    float LR = areaLightLR;
+    areaLight -> setRotation(vec3 (UD, LR, 0));
     light1 -> setIntensity (light1Intensity);
     light2 -> setIntensity (light2Intensity);
     spotlight -> setIntensity(spotlightIntensity);
@@ -142,6 +169,21 @@ void ofApp::draw(){
     drawSpotlights();
     //renderCam.drawGrid(); //draw 6 x 4 grid on plane (for debugging purposes)
     renderCam.drawRays(); //draw rays from renderCam (for debugging purposes)
+    
+//    vec3 point (1.23721, -2, -8.60465);
+//          Ray ray (point, normalize (vec3 (0,1,0)));
+//
+//          vec3 intersectNormal;
+//          vec3 intersectPt;
+//         ofSetColor (ofColor::green);
+//           ray.draw (35);
+//    bool within = areaLight -> withinLight(point);
+//   bool intersectPl = areaLight -> intersect (ray, intersectPt, intersectNormal);
+//    ofSetColor (ofColor::pink);
+//    ofDrawLine (areaLight -> bottomLeft(), intersectPt);
+//    ofSetColor (ofColor::white);
+//          cout << "hit: " << within << endl;
+//
     theCam -> end();
     
     //draw rendered image on screen
@@ -149,6 +191,9 @@ void ofApp::draw(){
         ofSetColor (ofColor::white);
         image.draw(0,0);
     }
+    
+
+
     
     gui.draw();
 }
@@ -162,15 +207,6 @@ void ofApp::keyPressed(int key){
             toErase = findIndex (selected[0]);
             scene.erase(scene.begin() + toErase);
         }
-    }
-    
-    if (key == 'c'){
-        for (SceneObject* sObj: selected){
-            sObj -> detachParent();
-        }
-        
-        selected.clear(); //clear all the selections
-        mainCam.getMouseInputEnabled() ? mainCam.disableMouseInput(): mainCam.enableMouseInput();
     }
     
     
@@ -199,6 +235,14 @@ void ofApp::keyPressed(int key){
             sphereCreationModeEnabled = true;
             break;
             //toggle on/off camera view
+        case 'c':
+            for (SceneObject* sObj: selected){
+                   sObj -> detachParent();
+               }
+               
+               selected.clear(); //clear all the selections
+               mainCam.getMouseInputEnabled() ? mainCam.disableMouseInput(): mainCam.enableMouseInput();
+            break;
         case 'm': //switch to main Camera (easyCam) view
             theCam = &mainCam;
             break;
@@ -228,6 +272,24 @@ void ofApp::keyPressed(int key){
             }
             else{
                 selectMultipleEnabled = true;
+            }
+            break;
+        //increase size of sphere
+        case OF_KEY_UP:
+            for (SceneObject* sObj: selected){
+                if (sObj -> getName() == "Sphere"){
+                    Sphere* sphere = (Sphere* ) sObj;
+                    sphere -> setRadius (sphere -> getRadius() + 0.2);
+                }
+            }
+            break;
+        //decrease size of sphere
+        case OF_KEY_DOWN:
+            for (SceneObject* sObj: selected){
+                if (sObj -> getName() == "Sphere"){
+                    Sphere* sphere = (Sphere* ) sObj;
+                    sphere -> setRadius (sphere -> getRadius() - 0.2);
+                }
             }
             break;
         default:
@@ -346,6 +408,7 @@ void ofApp::mousePressed(int x, int y, int button){
                 intersectPtClosest = intersectPt;
                 intersectNormClosest = intersectNormal;
             }
+            
         }
     }
     
@@ -395,7 +458,7 @@ void ofApp::mousePressed(int x, int y, int button){
     if (sphereCreationModeEnabled){
         scene.push_back(new Sphere(lastPtSelected, 1, ofColor::white));
     }
-    cout << lastPtSelected << endl;
+    cout << "last point selected " << lastPtSelected << endl;
     //    if (selectMultipleEnabled){
     //        lastSelected -> detachParent();
     //        for (SceneObject* sObj: selected){
@@ -601,7 +664,7 @@ ofColor ofApp::lambert(const glm::vec3 &point, const glm::vec3 &norm, const ofCo
                     for (int col = 0; col <  areaLight -> getNumCols(); col++){
                         vec3 cellPt (areaLight -> getCellPt(row, col));
                         if (!obstructed(point, norm, cellPt)){
-                            
+                            //cout << "In Light " << point << endl;
                             //distance from point to light
                             float r2 = distance2 (point, cellPt);
                             

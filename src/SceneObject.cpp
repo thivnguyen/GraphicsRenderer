@@ -188,3 +188,7 @@ bool SceneObject::isSelectable(){
 void SceneObject::setRotation (glm::vec3 rotate){
     rotation = rotate;
 }
+
+glm::vec3 SceneObject::getRotation(){
+    return rotation;
+}

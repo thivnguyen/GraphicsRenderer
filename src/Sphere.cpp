@@ -24,6 +24,10 @@ float Sphere::getRadius (){
     return radius;
 }
 
+void Sphere::setRadius (float r){
+    radius = r;
+}
+
 //check for Sphere intersection
 bool Sphere::intersect (Ray &ray, glm::vec3 &point, glm::vec3 &normal){
     return glm::intersectRaySphere(ray.getPoint(), ray.getDirection(), getPosition(), radius, point, normal);

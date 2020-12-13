@@ -18,6 +18,7 @@ public:
     bool intersect (Ray &ray, glm::vec3 &point, glm::vec3 &normal); //overload intersection function
     void draw();
     void draw(ofColor color);
+    void setRadius (float r);
     
 private:
     float radius;

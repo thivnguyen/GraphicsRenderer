@@ -1,22 +1,22 @@
 //
-//  AreaLight.h
+//  AreaLightTest.h
 //  GraphicsRenderer
 //
-//  Created by Thi Nguyen  on 11/25/20.
+//  Created by Thi Nguyen  on 12/11/20.
 //
 
-#ifndef AreaLight_h
-#define AreaLight_h
+#ifndef AreaLightTest_h
+#define AreaLightTest_h
 
 #include "Light.h"
 #include "Ray.h"
 
-class AreaLight: public Light {
+class AreaLightTest: public Light {
 public:
     //AreaLight(glm::vec3 pos, float lightInt, float w, float h, int col, int rows, float angle);
-    AreaLight(glm::vec3 pos, float lightInt);
-    AreaLight (glm::vec3 pos, float lightInt, bool horizontal);
-    AreaLight (glm::vec3 pos, float lightInt, glm::vec3 angle);
+    AreaLightTest(glm::vec3 pos, float lightInt);
+    AreaLightTest (glm::vec3 pos, float lightInt, bool horizontal);
+    AreaLightTest (glm::vec3 pos, float lightInt, float angle);
     void draw();
     void draw(ofColor color);
     float getWidth();
@@ -28,11 +28,6 @@ public:
     glm::vec2 getWidthRange();
     glm::vec2 getHeightRange();
     glm::vec3 startingCell();
-
-    glm::vec3 topLeft();
-    glm::vec3 bottomLeft();
-    glm::vec3 topRight();
-    glm::vec3 bottomRight();
     int getNumRows();
     int getNumCols();
     void setPosition (glm::vec3 pos);
@@ -49,7 +44,7 @@ private:
     float unitHeight;
     ofPlanePrimitive lightArea;
     glm::vec3 normal;
-    glm::vec3 normal2;
     bool isHorizontal;
 };
-#endif /* AreaLight_h */
+
+#endif /* AreaLightTest_h */

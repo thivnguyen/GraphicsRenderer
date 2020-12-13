@@ -40,6 +40,7 @@ public:
     void setRotation (glm::vec3 rotate);
     glm::mat4 getLocalMatrix();
     glm::mat4 getRotationMatrix();
+    glm::vec3 getRotation();
     
 private:
     glm::vec3 position;
