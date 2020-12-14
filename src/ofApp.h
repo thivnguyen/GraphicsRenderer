@@ -80,6 +80,13 @@ private:
     std::vector<Spotlight *> spotlights;
     Light ambient;
     
+    //lights
+    Light* light1;
+    Light* light2;
+    Spotlight* spotlight;
+    AreaLight* areaLight;
+    
+    //cameras
     ofEasyCam mainCam;
     ofCamera sideCam;
     ofCamera previewCam;
@@ -90,21 +97,21 @@ private:
     ofImage textureDiffuseH; //texture for horizontal plane
     ofImage textureSpectureH; //spec for vertical plane
     
+    //texture
     ofImage textureDiffuseV; //texture
     ofImage textureSpectureV; //spec
     
-//    ofPixels textureDiffuse;
-//    ofPixels textureSpecture;
+    //    ofPixels textureDiffuse;
+    //    ofPixels textureSpecture;
     int imageWidth = 600;
     int imageHeight = 400;
     
     //for debugging
-//    int imageWidth = 6;
-//    int imageHeight = 4;
+    //    int imageWidth = 6;
+    //    int imageHeight = 4;
     
     int textureHeightH;
     int textureWidthH;
-    
     int textureHeightV;
     int textureWidthV;
     
@@ -118,39 +125,31 @@ private:
     float u;
     float v;
     
-    float power;
+    float power; //power for phong shading
     
+    //"editing" modes
     bool sphereCreationModeEnabled;
     bool selectMultipleEnabled;
-    vector <SceneObject *> selected;
-    glm::vec3 lastPtSelected;
     bool dragModeEnabled;
     
+    glm::vec3 lastPtSelected;
     SceneObject* lastSelected;
     
+    vector <SceneObject *> selected;
+    
+    //gui
+    ofxPanel gui;
     ofxFloatSlider areaLightIntensity;
-    //ofxVec3Slider areaLightAngle;
     ofxFloatSlider areaLightLR;
     ofxFloatSlider areaLightUD;
+    ofxFloatSlider areaLightWidth;
+    ofxFloatSlider areaLightHeight;
     ofxFloatSlider light1Intensity;
     ofxFloatSlider light2Intensity;
     ofxFloatSlider spotlightIntensity;
     ofxFloatSlider spotlightAngle;
     ofxVec3Slider spotlightAim;
     ofxColorSlider sphereColor;
+    ofxFloatSlider powerControl;
     
-    ofxPanel gui;
-    
-    ofxLabel areaLightLbl;
-    ofxLabel spotlightLbl;
-    ofxLabel lightLbl;
-    ofxLabel sphereLbl;
-    
-    Light* light1;
-    Light* light2;
-    Spotlight* spotlight;
-    AreaLight* areaLight;
-    
-    Plane* plane;
-
 };
