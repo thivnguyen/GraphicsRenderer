@@ -22,6 +22,13 @@ void Spotlight::draw(){
     ofDrawLine(getPosition(), lightAim);
 }
 
+//draw the spotlight
+void Spotlight::draw(ofColor color){
+    ofSetColor (color);
+    ofDrawSphere(getPosition(), 0.2);
+    ofDrawLine(getPosition(), lightAim);
+}
+
 //returns true if the point is within the spotlight
 bool Spotlight::withinLight(glm::vec3 point){
     

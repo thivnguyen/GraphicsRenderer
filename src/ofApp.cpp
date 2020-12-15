@@ -15,7 +15,7 @@ using namespace glm;
 //--------------------------------------------------------------
 void ofApp::setup(){
     
-    ofSetBackgroundColor (ofColor :: black);
+    //ofSetBackgroundColor (ofColor :: black);
     
     theCam = &mainCam; //easyCam
     mainCam.setDistance (30.0);
@@ -25,14 +25,15 @@ void ofApp::setup(){
     selectMultipleEnabled = false;
     dragModeEnabled = false;
     sphereCreationModeEnabled = false;
+    guiHide = false;
     
     //Planes
     scene.push_back (new Plane (vec3(0,-2,2), ofColor::white, 30, 70, true));
-    scene.push_back ( new Plane (vec3(0,-2,-20), ofColor::white, 30, 70, false));
+    //scene.push_back ( new Plane (vec3(0,-2,-20), ofColor::white, 30, 70, false));
     
     //set lights and add them to scene
-    light1 = new Light (vec3(4,7,5), 0.5);
-    light2 = new Light (vec3(-7,4,0), 0.5);
+    light1 = new Light (vec3(4,7,5), 0.5, "Light 1");
+    light2 = new Light (vec3(-7,4,0), 0.5, "Light 2");
     spotlight = new Spotlight (vec3 (-1.5,10, 3), 0.5, 50, vec3 (1, -1.25, -3));
     areaLight = new AreaLight (vec3(0, 10, -5), 1.5);
     lights.push_back (light1);
@@ -58,7 +59,7 @@ void ofApp::setup(){
     gui.add (light1Intensity.setup("Light 1 Intensity", light1 -> getIntensity(), 0, 5));
     gui.add (light2Intensity.setup("Light 2 Intensity", light2 -> getIntensity(), 0, 5));
     
-   //spotlight controls
+    //spotlight controls
     gui.add (spotlightIntensity.setup("Spotlight Intensity", spotlight -> getIntensity(), 0, 5));
     gui.add (spotlightAngle.setup("Spotlight Angle", spotlight -> getAngle(), 0, 100));
     gui.add (spotlightAim.setup("Spotlight Aim", spotlight -> getAim(), vec3 (-15,-15,-15), vec3 (5,5,5)));
@@ -70,8 +71,8 @@ void ofApp::setup(){
     gui.add(sphereColor.setup("Sphere color", ofColor(255, 255, 255), ofColor(0, 0), ofColor(255, 255)));
     
     //load texture images
-    textureDiffuseH.load ("streetDiff.jpg"); //load texture image
-    textureSpectureH.load("streetSpec.jpg"); //load texture image
+    textureDiffuseH.load ("wood3Diff.jpg"); //load texture image
+    textureSpectureH.load("wood2Spec.jpg"); //load texture image
     
     textureDiffuseV.load ("woodDiff.jpg"); //load texture image
     textureSpectureV.load("woodSpec.jpg"); //load texture image
@@ -83,17 +84,17 @@ void ofApp::setup(){
     textureHeightV = textureDiffuseV.getHeight();
     
     //set num of "texture tiles" in both directions
-    numTilesHorizontal = 12;
-    numTilesVertical = 12;
+    numTilesHorizontal = 8;
+    numTilesVertical = 8;
     
     //preview cam setup
     previewCam.setPosition (renderCam.getPosition()); //place where renderCam is
     previewCam.lookAt(renderCam.getAim());
-      
+    
     //side cam setup
     sideCam.setPosition (vec3 (20,0,0)); //place on the side looking at entire scene
     sideCam.lookAt(renderCam.getAim());
-      
+    
     //alocate pixels for image
     image.allocate(imageWidth, imageHeight, OF_IMAGE_COLOR);
     
@@ -167,23 +168,8 @@ void ofApp::draw(){
     drawLights();
     drawSpotlights();
     //renderCam.drawGrid(); //draw 6 x 4 grid on plane (for debugging purposes)
-    renderCam.drawRays(); //draw rays from renderCam (for debugging purposes)
+    //renderCam.drawRays(); //draw rays from renderCam (for debugging purposes)
     
-    vec3 point (1.41368, -2, -3.02932);
-    // vec3 point (0, 10, -5);
-    Ray ray (point, normalize (vec3 (0,1,0)));
-    
-    vec3 intersectNormal;
-    vec3 intersectPt;
-    ofSetColor (ofColor::green);
-    ray.draw (35);
-    bool within = areaLight -> withinLight(point);
-    //   bool intersectPl = areaLight -> intersect (ray, intersectPt, intersectNormal);
-    //    ofSetColor (ofColor::pink);
-    //    ofDrawLine (areaLight -> bottomLeft(), intersectPt);
-    //    ofSetColor (ofColor::white);
-    //          cout << "hit: " << within << endl;
-    //
     theCam -> end();
     
     //draw rendered image on screen
@@ -194,8 +180,9 @@ void ofApp::draw(){
     
     
     
-    
-    gui.draw();
+    if (!guiHide){
+        gui.draw();
+    }
     
 }
 
@@ -207,6 +194,7 @@ void ofApp::keyPressed(int key){
         for (SceneObject* sObj: selected){
             toErase = findIndex (selected[0]);
             scene.erase(scene.begin() + toErase);
+            selected.erase(selected.begin());
         }
     }
     
@@ -230,6 +218,9 @@ void ofApp::keyPressed(int key){
             selected.clear(); //clear all the selections
             mainCam.getMouseInputEnabled() ? mainCam.disableMouseInput(): mainCam.enableMouseInput();
             break;
+        case 'g': //hide and unhide gui
+            guiHide ? guiHide = false : guiHide = true;
+            break;
         case 'm': //switch to main Camera (easyCam) view
             theCam = &mainCam;
             break;
@@ -249,9 +240,9 @@ void ofApp::keyPressed(int key){
         case 'h': //hide rendered image
             loadImage = false;
             break;
-            //shift key
+            
         case OF_KEY_SHIFT:
-            if (selectMultipleEnabled){
+            if (selectMultipleEnabled){ //shift key, toggle multi-select mode
                 for (SceneObject* sObj: selected){
                     sObj -> detachParent();
                 }
@@ -261,21 +252,23 @@ void ofApp::keyPressed(int key){
                 selectMultipleEnabled = true;
             }
             break;
-            //increase size of sphere
-        case OF_KEY_UP:
+            
+        case OF_KEY_UP: //up arrow, increase size of sphere
             for (SceneObject* sObj: selected){
                 if (sObj -> getName() == "Sphere"){
                     Sphere* sphere = (Sphere* ) sObj;
-                    sphere -> setRadius (sphere -> getRadius() + 0.2);
+                    sphere -> setRadius (sphere -> getRadius() + 0.025);
                 }
             }
             break;
-            //decrease size of sphere
-        case OF_KEY_DOWN:
+            
+        case OF_KEY_DOWN:  //down arrow, decrease size of sphere
             for (SceneObject* sObj: selected){
                 if (sObj -> getName() == "Sphere"){
                     Sphere* sphere = (Sphere* ) sObj;
-                    sphere -> setRadius (sphere -> getRadius() - 0.2);
+                    if (sphere -> getRadius() > 0.025){
+                        sphere -> setRadius (sphere -> getRadius() - 0.025);
+                    }
                 }
             }
             break;
@@ -416,7 +409,7 @@ void ofApp::mousePressed(int x, int y, int button){
     if (sphereCreationModeEnabled){
         scene.push_back(new Sphere(lastPtSelected, 1, ofColor::white));
     }
-    cout << "last point selected " << lastPtSelected << endl;
+    //cout << "last point selected " << lastPtSelected << endl;
 }
 
 
@@ -563,7 +556,10 @@ void ofApp::rayTrace(){
                     
                     //grab textures from texture maps
                     ofColor dif = textureDiff(intersectPtClosest, ((Plane*) closestObj));
-                    ofColor spec = textureSpec(intersectPtClosest, ((Plane*) closestObj));
+                   // ofColor spec = textureSpec(intersectPtClosest, ((Plane*) closestObj));
+                    
+                    // ofColor dif = closestObj -> getDiffuseColor();
+                    ofColor spec = closestObj -> getSpecularColor();
                     // cout << shader (intersectPtClosest, intersectNormClosest, dif, spec, power) << endl;
                     image.setColor(i, imageHeight - 1 - j, shader (intersectPtClosest, intersectNormClosest, dif, spec, power));
                 }

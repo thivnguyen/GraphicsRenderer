@@ -103,8 +103,8 @@ private:
     
     //    ofPixels textureDiffuse;
     //    ofPixels textureSpecture;
-    int imageWidth = 600;
-    int imageHeight = 400;
+    int imageWidth = 2400;
+    int imageHeight = 1600;
     
     //for debugging
     //    int imageWidth = 6;
@@ -151,5 +151,6 @@ private:
     ofxVec3Slider spotlightAim;
     ofxColorSlider sphereColor;
     ofxFloatSlider powerControl;
+    bool guiHide;
     
 };

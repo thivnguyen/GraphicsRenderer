@@ -17,6 +17,7 @@ public:
     glm::vec3 getAim();
     void setAim(glm::vec3 aim);
     void draw();
+    void draw(ofColor color);
     bool withinLight(glm::vec3 point);
     void setAngle (float newAngle);
     float getAngle ();
