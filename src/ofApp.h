@@ -2,7 +2,7 @@
 //  ofApp.h
 //  RayTracer
 //
-//  Edited by Thi Nguyen on 10/5/20.
+//  Edited by Thi Nguyen on 12/14/20.
 //
 
 #pragma once
@@ -103,8 +103,8 @@ private:
     
     //    ofPixels textureDiffuse;
     //    ofPixels textureSpecture;
-    int imageWidth = 2400;
-    int imageHeight = 1600;
+    int imageWidth = 1200;
+    int imageHeight = 800;
     
     //for debugging
     //    int imageWidth = 6;

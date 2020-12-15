@@ -2,7 +2,7 @@
 //  ofApp.h
 //  RayTracer
 //
-//  Created by Thi Nguyen  on 9/28/20.
+//  Created by Thi Nguyen  on 12/14/20.
 //
 
 #include "ofApp.h"
@@ -29,7 +29,7 @@ void ofApp::setup(){
     
     //Planes
     scene.push_back (new Plane (vec3(0,-2,2), ofColor::white, 30, 70, true));
-    //scene.push_back ( new Plane (vec3(0,-2,-20), ofColor::white, 30, 70, false));
+    scene.push_back ( new Plane (vec3(0,-2,-20), ofColor::white, 30, 70, false));
     
     //set lights and add them to scene
     light1 = new Light (vec3(4,7,5), 0.5, "Light 1");
@@ -71,10 +71,10 @@ void ofApp::setup(){
     gui.add(sphereColor.setup("Sphere color", ofColor(255, 255, 255), ofColor(0, 0), ofColor(255, 255)));
     
     //load texture images
-    textureDiffuseH.load ("wood3Diff.jpg"); //load texture image
+    textureDiffuseH.load ("plaster.jpg"); //load texture image
     textureSpectureH.load("wood2Spec.jpg"); //load texture image
     
-    textureDiffuseV.load ("woodDiff.jpg"); //load texture image
+    textureDiffuseV.load ("plaster.jpg"); //load texture image
     textureSpectureV.load("woodSpec.jpg"); //load texture image
     
     textureWidthH = textureDiffuseH.getWidth();
@@ -556,7 +556,7 @@ void ofApp::rayTrace(){
                     
                     //grab textures from texture maps
                     ofColor dif = textureDiff(intersectPtClosest, ((Plane*) closestObj));
-                   // ofColor spec = textureSpec(intersectPtClosest, ((Plane*) closestObj));
+                    // ofColor spec = textureSpec(intersectPtClosest, ((Plane*) closestObj));
                     
                     // ofColor dif = closestObj -> getDiffuseColor();
                     ofColor spec = closestObj -> getSpecularColor();
@@ -579,7 +579,7 @@ void ofApp::rayTrace(){
     }
     
     //save image
-    image.save("renderedImg.png", OF_IMAGE_QUALITY_BEST);
+    image.save("renderedImg2.png", OF_IMAGE_QUALITY_BEST);
     
     cout << "Done rendering" << endl;
 }
@@ -605,20 +605,22 @@ ofColor ofApp::lambert(const glm::vec3 &point, const glm::vec3 &norm, const ofCo
         if (light -> withinLight(point)){
             
             if (light -> getName() == "AreaLight"){
-                AreaLight* areaLight = (AreaLight *) light;
-                
-                //loop through "cells" on area light to determine ld
-                for (int row = 0; row <  areaLight -> getNumRows(); row++){
-                    for (int col = 0; col <  areaLight -> getNumCols(); col++){
-                        vec3 cellPt (areaLight -> getCellPt(row, col));
-                        if (!obstructed(point, norm, cellPt)){
-                            
-                            //distance from point to light
-                            //float r2 = distance2 (point, cellPt);
-                            
-                            //vector from point to light
-                            vec3 l (cellPt - point);
-                            ld += diffuse * (areaLight -> getUnitIntensity()/1) * glm::max(0.0f, glm::dot(normalize(norm), normalize(l)));
+                if (light -> getIntensity() != 0){
+                    AreaLight* areaLight = (AreaLight *) light;
+                    
+                    //loop through "cells" on area light to determine ld
+                    for (int row = 0; row <  areaLight -> getNumRows(); row++){
+                        for (int col = 0; col <  areaLight -> getNumCols(); col++){
+                            vec3 cellPt (areaLight -> getCellPt(row, col));
+                            if (!obstructed(point, norm, cellPt)){
+                                
+                                //distance from point to light
+                                //float r2 = distance2 (point, cellPt);
+                                
+                                //vector from point to light
+                                vec3 l (cellPt - point);
+                                ld += diffuse * (areaLight -> getUnitIntensity()/1) * glm::max(0.0f, glm::dot(normalize(norm), normalize(l)));
+                            }
                         }
                     }
                 }
@@ -654,26 +656,29 @@ ofColor ofApp::phong(const glm::vec3 &point, const glm::vec3 &norm, const ofColo
         if (light -> withinLight(point)){
             
             if (light -> getName() == "AreaLight"){
-                AreaLight* areaLight = (AreaLight *) light;
                 
-                //loop through "cells" on area light to determine ld
-                for (int row = 0; row <  areaLight -> getNumRows(); row++){
-                    for (int col = 0; col <  areaLight -> getNumCols(); col++){
-                        vec3 cellPt (areaLight -> getCellPt(row, col));
-                        
-                        //only add to ls if point is not in the shadows
-                        if (!obstructed(point, norm, cellPt)){
+                if (light -> getIntensity() != 0){
+                    AreaLight* areaLight = (AreaLight *) light;
+                    
+                    //loop through "cells" on area light to determine ld
+                    for (int row = 0; row <  areaLight -> getNumRows(); row++){
+                        for (int col = 0; col <  areaLight -> getNumCols(); col++){
+                            vec3 cellPt (areaLight -> getCellPt(row, col));
                             
-                            //distance from point to light
-                            //float r2 = distance2 (point, cellPt);
-                            
-                            //vector from point to light
-                            vec3 l (cellPt - point);
-                            
-                            //find bisector
-                            vec3 h = normalize (v + l);
-                            
-                            ls += specular * (areaLight -> getUnitIntensity()/1)  * glm::pow(glm::max(0.0f, glm::dot(normalize(norm), h)), power);
+                            //only add to ls if point is not in the shadows
+                            if (!obstructed(point, norm, cellPt)){
+                                
+                                //distance from point to light
+                                //float r2 = distance2 (point, cellPt);
+                                
+                                //vector from point to light
+                                vec3 l (cellPt - point);
+                                
+                                //find bisector
+                                vec3 h = normalize (v + l);
+                                
+                                ls += specular * (areaLight -> getUnitIntensity()/1)  * glm::pow(glm::max(0.0f, glm::dot(normalize(norm), h)), power);
+                            }
                         }
                     }
                 }
